@@ -1,0 +1,39 @@
+{
+  "name": "adj-validate",
+  "version": "0.1.0",
+  "description": "Validate ADJ journal entries and audit deliberation records",
+  "type": "module",
+  "bin": {
+    "adj-validate": "./bin/cli.js"
+  },
+  "main": "./src/index.js",
+  "exports": {
+    ".": "./src/index.js"
+  },
+  "files": [
+    "bin/",
+    "src/",
+    "schema/"
+  ],
+  "scripts": {
+    "test": "node --test src/*.test.js"
+  },
+  "keywords": [
+    "adj",
+    "agent-deliberation-journal",
+    "validate",
+    "calibration",
+    "audit"
+  ],
+  "author": "adj-manifest",
+  "license": "CC0-1.0",
+  "homepage": "https://adj-manifest.dev",
+  "repository": {
+    "type": "git",
+    "url": "https://git.marketally.com/logikonline/adj-validate"
+  },
+  "dependencies": {
+    "ajv": "^8.17.0",
+    "ajv-formats": "^3.0.0"
+  }
+}

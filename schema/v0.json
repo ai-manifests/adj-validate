@@ -1,0 +1,183 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://adj-manifest.dev/schema/v0.json",
+  "title": "ADJ Journal Entry",
+  "description": "A typed entry in an Agent Deliberation Journal. Five entry types capture the full lifecycle of a deliberation.",
+  "type": "object",
+  "required": ["entry_id", "entry_type", "deliberation_id", "timestamp"],
+  "properties": {
+    "entry_id": {
+      "type": "string",
+      "description": "Globally unique identifier for this entry",
+      "pattern": "^adj_"
+    },
+    "entry_type": {
+      "type": "string",
+      "enum": ["deliberation_opened", "proposal_emitted", "round_event", "deliberation_closed", "outcome_observed"],
+      "description": "Entry type discriminator"
+    },
+    "deliberation_id": {
+      "type": "string",
+      "description": "Links this entry to its deliberation",
+      "pattern": "^dlb_"
+    },
+    "timestamp": {
+      "type": "string",
+      "format": "date-time",
+      "description": "When the entry was written to the journal"
+    },
+    "prior_entry_hash": {
+      "type": ["string", "null"],
+      "description": "SHA-256 hash of the previous entry in this deliberation, or null"
+    }
+  },
+  "allOf": [
+    {
+      "if": {
+        "properties": { "entry_type": { "const": "deliberation_opened" } }
+      },
+      "then": {
+        "required": ["decision_class", "action", "participants"],
+        "properties": {
+          "decision_class": { "type": "string", "description": "Primary domain of the deliberation" },
+          "action": { "$ref": "#/$defs/action" },
+          "participants": {
+            "type": "array",
+            "items": { "type": "string" },
+            "minItems": 1,
+            "description": "Agent IDs expected to submit proposals"
+          },
+          "config": {
+            "type": "object",
+            "description": "Deliberation configuration",
+            "properties": {
+              "max_rounds": { "type": "integer", "minimum": 1 },
+              "participation_floor": { "type": "number", "minimum": 0, "maximum": 1 }
+            }
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": { "entry_type": { "const": "proposal_emitted" } }
+      },
+      "then": {
+        "required": ["proposal"],
+        "properties": {
+          "proposal": {
+            "type": "object",
+            "description": "Full ADP proposal object (see ADP schema)"
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": { "entry_type": { "const": "round_event" } }
+      },
+      "then": {
+        "required": ["round", "event_kind", "agent_id"],
+        "properties": {
+          "round": { "type": "integer", "minimum": 1, "description": "Belief-update round number" },
+          "event_kind": {
+            "type": "string",
+            "enum": ["falsification_evidence", "acknowledge", "reject", "amend", "revise", "challenge_tier", "tier_response", "timeout"],
+            "description": "State-machine transition type"
+          },
+          "agent_id": { "type": "string", "description": "Agent that produced this event" },
+          "target_agent_id": { "type": ["string", "null"], "description": "Agent whose condition or proposal is targeted" },
+          "target_condition_id": { "type": ["string", "null"], "description": "Dissent condition being addressed" },
+          "payload": { "type": "object", "description": "Event-specific data" }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": { "entry_type": { "const": "deliberation_closed" } }
+      },
+      "then": {
+        "required": ["termination", "round_count", "tier", "final_tally", "weights"],
+        "properties": {
+          "termination": {
+            "type": "string",
+            "enum": ["converged", "partial_commit", "deadlocked"]
+          },
+          "round_count": { "type": "integer", "minimum": 0 },
+          "tier": {
+            "type": "string",
+            "enum": ["reversible", "partially_reversible", "irreversible"]
+          },
+          "final_tally": {
+            "type": "object",
+            "required": ["approve_weight", "reject_weight", "abstain_weight", "total_weight", "approval_fraction", "participation_fraction", "threshold"],
+            "properties": {
+              "approve_weight": { "type": "number", "minimum": 0 },
+              "reject_weight": { "type": "number", "minimum": 0 },
+              "abstain_weight": { "type": "number", "minimum": 0 },
+              "total_weight": { "type": "number", "minimum": 0 },
+              "approval_fraction": { "type": "number", "minimum": 0, "maximum": 1 },
+              "participation_fraction": { "type": "number", "minimum": 0, "maximum": 1 },
+              "threshold": { "type": "number", "minimum": 0, "maximum": 1 }
+            }
+          },
+          "weights": {
+            "type": "object",
+            "additionalProperties": { "type": "number" },
+            "description": "Map of agent_id to computed weight"
+          },
+          "committed_action": {
+            "oneOf": [
+              { "$ref": "#/$defs/action" },
+              { "type": "null" }
+            ],
+            "description": "Action committed for execution, or null for deadlock"
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": { "entry_type": { "const": "outcome_observed" } }
+      },
+      "then": {
+        "required": ["observed_at", "outcome_class", "success", "reporter_id"],
+        "properties": {
+          "observed_at": { "type": "string", "format": "date-time", "description": "When the outcome was observed" },
+          "outcome_class": {
+            "type": "string",
+            "enum": ["binary", "graded"],
+            "description": "Whether success is boolean or numeric"
+          },
+          "success": {
+            "oneOf": [
+              { "type": "boolean" },
+              { "type": "number", "minimum": 0, "maximum": 1 }
+            ],
+            "description": "true/false for binary, 0-1 for graded"
+          },
+          "evidence_refs": {
+            "type": "array",
+            "items": { "type": "string" },
+            "description": "URIs pointing to outcome evidence"
+          },
+          "reporter_id": { "type": "string", "description": "Agent that reported the outcome" },
+          "reporter_confidence": { "type": "number", "minimum": 0, "maximum": 1 },
+          "ground_truth": { "type": "boolean", "description": "If true, outcome is not subject to reporter calibration" },
+          "supersedes": { "type": "string", "description": "entry_id of a prior outcome_observed this entry corrects" }
+        }
+      }
+    }
+  ],
+  "$defs": {
+    "action": {
+      "type": "object",
+      "required": ["kind", "target"],
+      "properties": {
+        "kind": { "type": "string" },
+        "target": { "type": "string" },
+        "parameters": { "type": "object", "additionalProperties": { "type": "string" } }
+      }
+    }
+  }
+}
