@@ -30,7 +30,7 @@
   "homepage": "https://adj-manifest.dev",
   "repository": {
     "type": "git",
-    "url": "https://git.marketally.com/logikonline/adj-validate"
+    "url": "https://git.marketally.com/ai-manifests/adj-validate"
   },
   "dependencies": {
     "ajv": "^8.17.0",
