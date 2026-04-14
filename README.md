@@ -70,3 +70,7 @@ const cal = computeCalibration(pairs);
 ## Status
 
 **v0.1** — Validates against ADJ spec v0.
+
+## License
+
+Apache-2.0 — see [`LICENSE`](LICENSE) for the full license text and [`NOTICE`](NOTICE) for attribution.
