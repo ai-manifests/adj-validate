@@ -20,17 +20,15 @@ jobs:
         with:
           node-version: '20'
 
-      - name: Configure Gitea npm auth
+      - name: Configure Gitea npm registry + auth
         run: |
           cat > ~/.npmrc <<EOF
+          @ai-manifests:registry=https://git.marketally.com/api/packages/ai-manifests/npm/
           //git.marketally.com/api/packages/ai-manifests/npm/:_authToken=${{ secrets.GITEATOKEN }}
           EOF
 
       - name: Install dependencies
         run: npm install --no-audit --no-fund
 
-      - name: Publish adj-validate to Gitea npm
-        run: |
-          npm publish \
-            --registry=https://git.marketally.com/api/packages/ai-manifests/npm/ \
-            --access public
+      - name: Publish @ai-manifests/adj-validate to Gitea npm
+        run: npm publish --access public

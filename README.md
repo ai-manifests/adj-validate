@@ -5,7 +5,7 @@ Validate [ADJ](https://adj-manifest.dev) journal entries, audit deliberation rec
 ## Install
 
 ```bash
-npm install -g adj-validate
+npm install -g @ai-manifests/adj-validate
 ```
 
 ## Usage
@@ -60,7 +60,7 @@ Extracts (confidence, outcome) pairs, computes the Brier score, and reports the 
 ## Programmatic Use
 
 ```javascript
-import { validateEntry, validateDeliberation, computeCalibration, extractScoringPairs } from 'adj-validate';
+import { validateEntry, validateDeliberation, computeCalibration, extractScoringPairs } from '@ai-manifests/adj-validate';
 
 const result = validateEntry(entry);
 const dlbResult = validateDeliberation(entries);

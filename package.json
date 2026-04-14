@@ -1,6 +1,6 @@
 {
-  "name": "adj-validate",
-  "version": "0.1.0",
+  "name": "@ai-manifests/adj-validate",
+  "version": "0.3.0",
   "description": "Validate ADJ journal entries and audit deliberation records",
   "type": "module",
   "bin": {
