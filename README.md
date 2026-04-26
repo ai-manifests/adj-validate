@@ -1,5 +1,11 @@
 # adj-validate
 
+[![npm](https://img.shields.io/npm/v/@ai-manifests/adj-validate.svg?label=npm)](https://www.npmjs.com/package/@ai-manifests/adj-validate)
+[![Downloads](https://img.shields.io/npm/dm/@ai-manifests/adj-validate.svg)](https://www.npmjs.com/package/@ai-manifests/adj-validate)
+[![Node](https://img.shields.io/badge/node-20%2B-blue.svg)](https://nodejs.org/)
+[![License](https://img.shields.io/badge/License-Apache_2.0-blue.svg)](LICENSE)
+[![Spec](https://img.shields.io/badge/spec-adj--manifest.dev-informational)](https://adj-manifest.dev)
+
 Validate [ADJ](https://adj-manifest.dev) journal entries, audit deliberation records, and verify calibration scoring.
 
 ## Install
